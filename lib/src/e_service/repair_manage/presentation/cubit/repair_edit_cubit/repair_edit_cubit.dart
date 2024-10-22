@@ -149,7 +149,6 @@ class RepairEditCubit extends Cubit<RepairEditState> {
           Lst_ES_ROAttachFile: lst_ES_ROAttachFile,
       );
       final params = jsonEncode(objRQ_ES_ROEditModel.toJson());
-      print("TrungLQ1: ${objRQ_ES_ROEditModel.es_ROEdit.AppointmentDTimeUTC}");
       final appointmentTime = DateTime.parse(es_ROEdit.ReceptionDTimeUTC);
       final now = DateTime.now();
       final day5Now = DateTime(now.year, now.month, 5);

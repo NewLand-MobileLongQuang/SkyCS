@@ -21,7 +21,7 @@ class AppConfigValuesDev extends AppConfigValuesBase
   String get gwUserCode => 'idocNet.idn.EntryCenterGate.Sv';
 
   @override
-  String get solutionCode => 'ESERVICE';
+  String get solutionCode => 'DEVSKYCS';
 
   @override
   String get appAgent => 'Mobile-eService';
@@ -30,10 +30,10 @@ class AppConfigValuesDev extends AppConfigValuesBase
   String get appVerCode => 'V1';
 
   @override
-  String get gwPasswordSolution => 'idocNet.idn.eService.Sv';
+  String get gwPasswordSolution => 'idocNet.idn.SkyCS.Sv';
 
   @override
-  String get gwUserCodeSolution => 'idocNet.idn.eService.Sv';
+  String get gwUserCodeSolution => 'idocNet.idn.SkyCS.Sv';
 
   @override
   String get scrTplCodeSys => 'SCRTPLCODESYS.2023';

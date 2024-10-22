@@ -5,6 +5,7 @@ import 'package:idnstd/core/data/models/common_model.dart';
 import 'package:idnstd/core/errors/exceptions.dart';
 import 'package:idnstd/core/utils/string_generate.dart';
 import 'package:idnstd/core/utils/typedef.dart';
+import 'package:idnstd/src/sky_cs/customer/data/models/rt_sky_customer_all_detail_model.dart';
 import 'package:idnstd/src/sky_cs/customer/data/models/rt_sky_customer_type_model.dart';
 import 'package:idnstd/src/sky_cs/customer/data/models/sky_customer_column_model.dart';
 import 'package:idnstd/src/sky_cs/customer/data/models/sky_customer_contact_model.dart';
@@ -355,6 +356,36 @@ class SkyCSSvDataSource extends BaseRemoteDataSource{
       final res = CommonModel.fromJsonObjDataList(
         response['Data'] as DataMap,
             (data) => (data as List).map((e) => SKY_CustomerContactModel.fromJson(e as DataMap)).toList(),
+      );
+      return res;
+    }
+  }
+
+  Future<CommonModel<RT_SKY_CustomerAllDetailModel>> postGetAllByCustomerCodeSys({required String path, DataMap? params}) async {
+    final ss = SessionInfo.current();
+    final response = await doPostWithHeaders(
+      path: path,
+      headers: {
+        'Authorization': 'Bearer ${ss.auth.AccessToken}',
+        'NetworkId': ss.org?.Id.toString() ?? '',
+        'OrgId': ss.org?.Id.toString() ?? '',
+        'GwUserCode': AppConfig.current().gwUserCodeSolution,
+        'GwPassword': AppConfig.current().gwPasswordSolution,
+        'UtcOffset': ss.user.TimeZone.toString(),
+        'AppAgent': AppConfig.current().appAgent,
+        'AppLanguageCode': ss.user.Language,
+        'AppVerCode': AppConfig.current().appVerCode,
+        'Tid': StringGenerate.getCurrentTime(),
+        'AppTId': StringGenerate.getCurrentTime(),
+      },
+      params: params,
+    );
+    if(response == null){
+      throw const ApiException(Message: 'No data');
+    } else {
+      final res = CommonModel.fromJsonObjData(
+        response['Data'] as DataMap,
+            (data) => RT_SKY_CustomerAllDetailModel.fromJson(data as DataMap),
       );
       return res;
     }

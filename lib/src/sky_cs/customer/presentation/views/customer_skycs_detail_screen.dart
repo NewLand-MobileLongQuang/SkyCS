@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:idnstd/core/common/views/loading_view.dart';
 import 'package:idnstd/core/common/widgets/inputs/i_select_field.dart';
 import 'package:idnstd/core/res/colors.dart';
 import 'package:idnstd/core/res/strings.dart';
 import 'package:idnstd/core/res/test_style.dart';
 import 'package:idnstd/core/utils/string_generate.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_cpn_campaign_customer.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_et_ticket.dart';
 import 'package:idnstd/src/sky_cs/customer/presentation/widgets/called_view.dart';
 import 'package:idnstd/src/sky_cs/customer/presentation/widgets/campaign_view.dart';
 import 'package:idnstd/src/sky_cs/customer/presentation/widgets/change_view.dart';
@@ -50,6 +53,20 @@ class _CustomerSkyCSDetailScreenState extends State<CustomerSkyCSDetailScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<CustomerSkyCSDetailCubit, CustomerSkyCSDetailState>(
       builder: (context, state) {
+        if (state is CustomerSkyCSDetailLoading) {
+          return Container(
+            height: MediaQuery
+                .of(context)
+                .size
+                .height,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            color: AppColors.textWhiteColor,
+            child: const LoadingView(),
+          );
+        }
         if (state is CustomerSkyCSDetailStateLoaded) {
           return DefaultTabController(
             initialIndex: 0,
@@ -68,19 +85,23 @@ class _CustomerSkyCSDetailScreenState extends State<CustomerSkyCSDetailScreen> {
               ),
               body: Column(
                 children: [
-                  _customerView(state.Customer),
+                  _customerView(state.customerDetail),
                   _tabBar(),
-                  _tabBarView(state.Customer, state.listcushist, state.listcuscontract, state.listGroupFold, state.listColumnFold),
+                  _tabBarView(
+                    customer: state.customerDetail,
+                    listTicket: state.listTicket,
+                    listCampaign: state.listCampaign,
+                  ),
                 ],
               ),
             ),
           );
-        } else if (state is CustomerSkyCSDetailStateError) {
-          return Center(child: Text('Error: ${state.message}'));
-        } else {
-          return Center(child: CircularProgressIndicator());
         }
-      },
+        if (state is CustomerSkyCSDetailStateError) {
+          return Center(child: Text('Error: ${state.message}'));
+        }
+        return Container();
+      }
     );
   }
 
@@ -195,59 +216,24 @@ class _CustomerSkyCSDetailScreenState extends State<CustomerSkyCSDetailScreen> {
     );
   }
 
-  Widget _tabBarView(SKY_CustomerDetail customer,List<SKY_CustomerHist> listcushist,
-  List<SKY_CustomerContact> listcuscontract, List<SKY_CustomerGroupModel> listGroupFold,
-  List<SKY_CustomerColumnModel> listColumnFold ) {
+  Widget _tabBarView({
+    required SKY_CustomerDetail customer,
+    required List<SKY_CustomerETTicket> listTicket,
+    required List<SKY_CustomerCpnCampaignCustomer> listCampaign,
+  }) {
     return Expanded(
       child: TabBarView(
         children: [
-          const ListViewCustomerDetail(type: 'Tất cả'),
-          const ListViewCustomerDetail(type: 'Cuộc gọi'),
-          const ListViewCustomerDetail(type: 'eTicket'),
-          const ListViewCustomerDetail(type: 'Chiến dịch'),
-          InfoCustomerView(customer: customer, listGroupFold: listGroupFold,listColumnFold: listColumnFold,),
-          ContactView(listcuscontract: listcuscontract,),
-          ChangeView(lischange: listcushist,),
+          ETicketView(listTicket: listTicket),
+          ETicketView(listTicket: listTicket),
+
+          ETicketView(listTicket: listTicket),
+          CampaignView(listCampaign: listCampaign),
+          InfoCustomerView(customer: customer),
+          ContactView(customerCodeSys: customerCodeSys),
+          ChangeView(customerCodeSys: customerCodeSys),
         ],
       ),
-    );
-  }
-}
-
-class ListViewCustomerDetail extends StatefulWidget {
-  const ListViewCustomerDetail({super.key, required this.type});
-
-  final String type;
-
-  @override
-  State<ListViewCustomerDetail> createState() => _ListViewCustomerDetailState();
-}
-
-class _ListViewCustomerDetailState extends State<ListViewCustomerDetail> {
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) {
-        if (widget.type == 'Tất cả') {
-          //return CalledView();
-          return const AllView();
-        }
-        if (widget.type == 'Cuộc gọi') {
-          return const CalledView();
-        }
-        if (widget.type == 'eTicket') {
-          return const ETicketView();
-        }
-        if (widget.type == 'Chiến dịch') {
-          return const CampaignView();
-        }
-        return Container();
-      },
-      separatorBuilder: (context, index) => const Divider(
-        height: 1,
-        color: AppColors.divideColor,
-      ),
-      itemCount: 10,
     );
   }
 }

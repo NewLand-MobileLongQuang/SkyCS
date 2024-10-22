@@ -8,15 +8,18 @@ final class CustomerSkyCSManageInitial extends CustomerSkyCSManageState {}
 final class CustomerSkyCSManageLoading extends CustomerSkyCSManageState {}
 
 final class CustomerSkyCSManageLoaded extends CustomerSkyCSManageState {
-  final List<SKY_CustomerInfo> listcusomter;
-
   CustomerSkyCSManageLoaded({
-    required this.listcusomter,
+    required this.listCustomer,
   });
+  final List<SKY_CustomerInfo> listCustomer;
+}
+
+final class CustomerSkyCSManageLoadingMore extends CustomerSkyCSManageLoaded {
+  CustomerSkyCSManageLoadingMore({required super.listCustomer});
 }
 
 final class CustomerSkyCSManageError extends CustomerSkyCSManageState {
-  final String message;
 
   CustomerSkyCSManageError(this.message);
+  final String message;
 }

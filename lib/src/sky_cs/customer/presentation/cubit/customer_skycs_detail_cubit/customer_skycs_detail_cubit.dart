@@ -1,6 +1,11 @@
 import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/rt_sky_customer_all_detail.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_call_call.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_cpn_campaign_customer.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_et_ticket.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_by_customer_code_sys.dart';
 import 'package:meta/meta.dart';
 
 import '../../../../../../core/configs/app_config.dart';
@@ -21,86 +26,44 @@ part 'customer_skycs_detail_state.dart';
 class CustomerSkyCSDetailCubit extends Cubit<CustomerSkyCSDetailState> {
   CustomerSkyCSDetailCubit({
     required GetByCustomerCodeSysUseCase getByCustomerCodeSysUseCase,
-    required SearchCustomerHistUseCase searchCustomerHistUseCase,
-    required SearchCustomerContactUseCase searchCustomerContactUseCase,
-    required SearchCustomerGroupUseCase searchCustomerGroupUseCase,
-    required SearchCustomerColumnUseCase searchCustomerColumnUseCase,
+    required GetAllByCustomerCodeSysUseCase getAllByCustomerCodeSysUseCase,
   }) :_getByCustomerCodeSysUseCase = getByCustomerCodeSysUseCase,
-        _searchCustomerHistUseCase = searchCustomerHistUseCase,
-        _searchCustomerContactUseCase = searchCustomerContactUseCase,
-        _searchCustomerGroupUseCase = searchCustomerGroupUseCase,
-        _searchCustomerColumnUseCase = searchCustomerColumnUseCase,
+      _getAllByCustomerCodeSysUseCase = getAllByCustomerCodeSysUseCase,
         super(CustomerSkyCSDetailInitial());
-  final GetByCustomerCodeSysUseCase _getByCustomerCodeSysUseCase;
-  final SearchCustomerHistUseCase _searchCustomerHistUseCase;
-  final SearchCustomerContactUseCase _searchCustomerContactUseCase;
-  final SearchCustomerGroupUseCase _searchCustomerGroupUseCase;
-  final SearchCustomerColumnUseCase _searchCustomerColumnUseCase;
 
-  Future<void> init(String cus) async {
+  final GetByCustomerCodeSysUseCase _getByCustomerCodeSysUseCase;
+  final GetAllByCustomerCodeSysUseCase _getAllByCustomerCodeSysUseCase;
+
+  Future<void> init(String customerCodeSys) async {
     emit(CustomerSkyCSDetailLoading());
     try {
-      final Customer = await _getByCustomerCodeSysUseCase(
+      final customerDetail = await _getByCustomerCodeSysUseCase(
         GetByCustomerCodeSysParams(
           ScrTplCodeSys: AppConfig.current().scrTplCodeSys,
-          CustomerCodeSys:cus,
+          CustomerCodeSys: customerCodeSys,
           Ft_PageIndex: '0',
           Ft_PageSize: '1000',
         ),
       );
-      final CustomerHist = await _searchCustomerHistUseCase(
-        SearchCustomerHistParams(
-          CustomerCodeSys: cus,
-          Ft_PageIndex: '0',
-          Ft_PageSize: '1000',
+      final customerAllDetail = await _getAllByCustomerCodeSysUseCase(
+        GetAllByCustomerCodeSysParams(
+          CustomerCodeSys: customerCodeSys,
         ),
       );
-      final CustomerContact = await _searchCustomerContactUseCase(
-        SearchCustomerContactParams(
-          CustomerCodeSys: cus,
-          Ft_PageIndex: '0',
-          Ft_PageSize: '1000',
-          OrderByClause:'',
-            FlagActive:''
-        ),
-      );
-      final listGroup = await _searchCustomerGroupUseCase.call(
-        const SearchCustomerGroupParams(
-          ScrTplCodeSys: 'ScrTplCodeSys.2023',
-          FlagActive: '1',
-          Ft_PageIndex: '0',
-          Ft_PageSize: '1000',
-        ),
-      );
-      final listColumn = await _searchCustomerColumnUseCase.call(
-        const SearchCustomerColumnParams(
-          ScrTplCodeSys: 'ScrTplCodeSys.2023',
-          FlagActive: '1',
-          Ft_PageIndex: '0',
-          Ft_PageSize: '1000',
-          OrderByClause: 'ProvinceCode asc',
-        ),
-      );
-      final listGroupFold = listGroup.fold((l) => l, (r) => r) as List<SKY_CustomerGroupModel>;
-      final listColumnFold = listColumn.fold((l) => l, (r) => r) as List<SKY_CustomerColumnModel>;
-      final listcusFold = Customer.fold((l) => l, (r) => r) as SKY_CustomerDetail;
-      final listcusHistFold = CustomerHist.fold((l) => l, (r) => r) as List<SKY_CustomerHist>;
-      final listcusContactFold = CustomerContact.fold((l) => l, (r) => r) as List<SKY_CustomerContact>;
 
-      final jsonpartnertype = jsonDecode(listcusFold.Lst_Mst_Customer.first.CustomerInPartnerTypeJson) as List<dynamic>;
-      //final jsonpartner = jsonDecode(jsonpartnertype.first['Mst_PartnerType'].toString()) as List<dynamic>;
+      final customerDetailFold = customerDetail.fold((l) => l, (r) => r) as SKY_CustomerDetail;
+      final customerAllDetailFold = customerAllDetail.fold((l) => l, (r) => r) as RT_SKY_CustomerAllDetail;
+      print('TrungLQ:${jsonEncode(customerAllDetailFold)}');
 
-      print("LOG: CHECK CUSINFO ${jsonpartnertype.first}");
 
       emit(CustomerSkyCSDetailStateLoaded(
-        Customer: listcusFold,
-        listcushist: listcusHistFold,
-        listcuscontract: listcusContactFold,
-        listGroupFold: listGroupFold,
-        listColumnFold: listColumnFold,
+        customerDetail: customerDetailFold,
+        listCall: customerAllDetailFold.Lst_Call_Call,
+        listTicket: customerAllDetailFold.Lst_ET_Ticket,
+        listCampaign: customerAllDetailFold.Lst_Cpn_CampaignCustomer,
       ));
     } catch (e) {
-      emit(CustomerSkyCSDetailStateError(e.toString()));
+      emit(CustomerSkyCSDetailStateError(message: e.toString()));
     }
   }
 }

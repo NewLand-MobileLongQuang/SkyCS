@@ -12,6 +12,7 @@ import 'package:idnstd/src/sky_cs/customer/data/datasource/sky_customer_datasour
 import 'package:idnstd/src/sky_cs/customer/data/repos/sky_customer_repo_impl.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/repos/sky_customer_repo.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/create_customer.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_by_customer_code_sys.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_customer_partner_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_customer_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_by_cutomer_code_sys.dart';
@@ -33,23 +34,18 @@ import 'package:idnstd/src/sky_cs/presentation/cubit/sky_cs_cubit.dart';
 
 Future<void> skyCSManageInit() async {
   sl
-    ..registerFactory(() => SkyCsCubit())
-    ..registerFactory(() => CallCubit())
-    ..registerFactory(() => ForwardCubit())
+    ..registerFactory(SkyCsCubit.new)
+    ..registerFactory(CallCubit.new)
+    ..registerFactory(ForwardCubit.new)
 
   // Khach hang
     ..registerFactory(() => CustomerSkyCSManageCubit(
         searchCustomerSkyCSUseCase: sl(),
-        getByCustomerCodeSysUseCase: sl(),
-        searchCustomerHistUseCase: sl(),
-        searchCustomerContactUseCase: sl()
     ))
     ..registerFactory(() => CustomerSkyCSDetailCubit(
       getByCustomerCodeSysUseCase: sl(),
-      searchCustomerHistUseCase: sl(),
-      searchCustomerContactUseCase: sl(),
-      searchCustomerGroupUseCase: sl(),
-      searchCustomerColumnUseCase: sl(),))
+      getAllByCustomerCodeSysUseCase: sl(),
+    ))
     ..registerFactory(() => CustomerSkyCSCreateCubit(
       searchCustomerGroupUseCase: sl(),
       searchCustomerColumnUseCase: sl(),
@@ -69,24 +65,27 @@ Future<void> skyCSManageInit() async {
     ..registerLazySingleton(() => GetAllCustomerPartnerTypeUseCase(sl()))
     ..registerLazySingleton(() => SearchZaloUserUseCase(sl()))
 
+
     ..registerLazySingleton(() => SearchCustomerSkyCSUseCase(sl()))
     ..registerLazySingleton(() => GetByCustomerCodeSysUseCase(sl()))
     ..registerLazySingleton(() => SearchCustomerHistUseCase(sl()))
     ..registerLazySingleton(() => SearchCustomerContactUseCase(sl()))
+    ..registerLazySingleton(() => GetAllByCustomerCodeSysUseCase(sl()))
     ..registerLazySingleton<SKY_CustomerRepository>(() => SKY_CustomerRepositoryImpl(sl()))
     ..registerLazySingleton<SKY_CustomerDataSource>(() => SKY_CustomerDataSource(sl()))
 
-    ..registerFactory(() => ChangeDetailCubit())
-    ..registerFactory(() => CampaignCubit())
-    ..registerFactory(() => CampaignManageCubit())
-    ..registerFactory(() => CampaignAgentCubit())
-    ..registerFactory(() => ContactHistoryCubit())
-    ..registerFactory(() => CampaignPerformCubit())
-    ..registerFactory(() => CampaignPerformDetailCubit())
-    ..registerFactory(() => CampaignCustomerDetailCubit())
+    ..registerFactory(ChangeDetailCubit.new)
+    ..registerFactory(CampaignCubit.new)
+    ..registerFactory(CampaignManageCubit.new)
+    ..registerFactory(CampaignAgentCubit.new)
+    ..registerFactory(ContactHistoryCubit.new)
+    ..registerFactory(CampaignPerformCubit.new)
+    ..registerFactory(CampaignPerformDetailCubit.new)
+    ..registerFactory(CampaignCustomerDetailCubit.new)
+
   //eTicket
-    ..registerFactory(() => eTicketManageCubit())
-    ..registerFactory(() => eTicketCreateCubit())
-    ..registerFactory(() => eTicketDetailCubit());
+    ..registerFactory(eTicketManageCubit.new)
+    ..registerFactory(eTicketCreateCubit.new)
+    ..registerFactory(eTicketDetailCubit.new);
 
 }

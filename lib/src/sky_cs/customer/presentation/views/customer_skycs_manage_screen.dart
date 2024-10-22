@@ -1,31 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:idnstd/core/common/views/loading_view.dart';
 import 'package:idnstd/core/res/colors.dart';
 import 'package:idnstd/core/res/strings.dart';
 import 'package:idnstd/core/res/test_style.dart';
+import 'package:idnstd/core/services/injection_container.dart';
 import 'package:idnstd/core/utils/string_generate.dart';
 import 'package:idnstd/src/sky_cs/customer/presentation/cubit/customer_skycs_manage_cubit/customer_skycs_manage_cubit.dart';
 
 import '../../domain/entities/sky_customer_info.dart';
 
-class CustomerSkyCSManageScreen extends StatefulWidget {
+
+class CustomerSkyCSManageScreen extends StatelessWidget {
   const CustomerSkyCSManageScreen({super.key});
 
   static const routeName = '/customer-skycs-manage';
 
   @override
-  State<CustomerSkyCSManageScreen> createState() =>
-      _CustomerSkyCSManageScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => CustomerSkyCSManageCubit(searchCustomerSkyCSUseCase: sl())..init(),
+      child: const CustomerSkyCSManageUIScreen(),
+    );
+  }
 }
 
-class _CustomerSkyCSManageScreenState extends State<CustomerSkyCSManageScreen> {
+class CustomerSkyCSManageUIScreen extends StatefulWidget {
+  const CustomerSkyCSManageUIScreen({super.key});
+
+  @override
+  State<CustomerSkyCSManageUIScreen> createState() => _CustomerSkyCSManageUIScreenState();
+}
+
+class _CustomerSkyCSManageUIScreenState extends State<CustomerSkyCSManageUIScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool isEmptyData = true;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent) {
+        context.read<CustomerSkyCSManageCubit>().loadMore();
+      }
+    });
     super.initState();
-    context.read<CustomerSkyCSManageCubit>().init();
   }
 
   @override
@@ -37,7 +56,7 @@ class _CustomerSkyCSManageScreenState extends State<CustomerSkyCSManageScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSearchBar(),
+            _buildSearchBar(context),
             const SizedBox(height: 16),
             _buildCustomerList(),
             _buildAddButton(),
@@ -65,7 +84,7 @@ class _CustomerSkyCSManageScreenState extends State<CustomerSkyCSManageScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -75,15 +94,13 @@ class _CustomerSkyCSManageScreenState extends State<CustomerSkyCSManageScreen> {
               setState(() {
                 isEmptyData = value.isEmpty;
               });
-              // Trigger search in Cubit
-              // context.read<CustomerSkyCSManageCubit>().search(_searchController.text);
+              if(value.isEmpty) {
+                context.read<CustomerSkyCSManageCubit>().init();
+              }
+              //context.read<CustomerSkyCSManageCubit>().search(_searchController.text);
             },
             onSubmitted: (value) {
-              setState(() {
-                isEmptyData = value.isEmpty;
-              });
-              // Trigger search in Cubit
-              // context.read<CustomerSkyCSManageCubit>().search(_searchController.text);
+              context.read<CustomerSkyCSManageCubit>().search(_searchController.text);
             },
             textInputAction: TextInputAction.search,
             decoration: InputDecoration(
@@ -101,7 +118,8 @@ class _CustomerSkyCSManageScreenState extends State<CustomerSkyCSManageScreen> {
               suffixIcon: isEmptyData
                   ? PopupMenuButton(
                 icon: const Icon(Icons.more_vert),
-                itemBuilder: (context) => [
+                itemBuilder: (context) =>
+                [
                   PopupMenuItem(
                     child: const Text('Tìm kiếm nâng cao'),
                     onTap: () {
@@ -117,6 +135,7 @@ class _CustomerSkyCSManageScreenState extends State<CustomerSkyCSManageScreen> {
                   setState(() {
                     isEmptyData = true;
                   });
+                  context.read<CustomerSkyCSManageCubit>().init();
                 },
               ),
             ),
@@ -134,22 +153,42 @@ class _CustomerSkyCSManageScreenState extends State<CustomerSkyCSManageScreen> {
         },
         builder: (context, state) {
           if (state is CustomerSkyCSManageLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is CustomerSkyCSManageLoaded) {
-            return ListView.separated(
-              itemCount: state.listcusomter.length,
-              separatorBuilder: (context, index) => Divider(color: AppColors.divideColor),
-              itemBuilder: (context, index) {
-                return _CustomerItem(customer: state.listcusomter[index]);
-              },
-            );
-          } else {
-            return const Center(
-              child: Text('No customers found'),
+            return Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: AppColors.textWhiteColor,
+              child: const LoadingView(),
             );
           }
+          if (state is CustomerSkyCSManageError) {
+            return Text(
+              state.message,
+            );
+          }
+          if (state is CustomerSkyCSManageLoaded) {
+            return SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: [
+                  ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: state.listCustomer.length,
+                    separatorBuilder: (context, index) => const Divider(color: AppColors.divideColor),
+                    itemBuilder: (context, index) {
+                      return _customerItem(customer: state.listCustomer[index]);
+                    },
+                  ),
+                  if(state is CustomerSkyCSManageLoadingMore)...[
+                    const LoadingView(),
+                  ],
+                ],
+              ),
+            );
+          }
+          return const Center(
+            child: Text('No customers found'),
+          );
         },
       ),
     );
@@ -178,21 +217,10 @@ class _CustomerSkyCSManageScreenState extends State<CustomerSkyCSManageScreen> {
       ],
     );
   }
-}
 
-class _CustomerItem extends StatelessWidget {
-  final SKY_CustomerInfo customer;
-
-  const _CustomerItem({
-    required this.customer,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _customerItem({required SKY_CustomerInfo customer}) {
     return InkWell(
       onTap: () {
-        // Handle customer item tap
-        // context.read<CustomerManageCubit>().getByCustomerCodeSys(customer.customerCodeSys);
         Navigator.pushNamed(context, '/customer-skycs-detail', arguments: {
           'CustomerCodeSys': customer.CustomerCodeSys,
         });

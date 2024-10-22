@@ -8,23 +8,22 @@ final class CustomerSkyCSDetailInitial extends CustomerSkyCSDetailState {}
 final class CustomerSkyCSDetailLoading extends CustomerSkyCSDetailState {}
 
 final class CustomerSkyCSDetailStateLoaded extends CustomerSkyCSDetailState {
-  final SKY_CustomerDetail Customer;
-  final List<SKY_CustomerHist> listcushist;
-  final List<SKY_CustomerContact> listcuscontract;
-  final List<SKY_CustomerGroupModel> listGroupFold;
-  final List<SKY_CustomerColumnModel> listColumnFold;
-
   CustomerSkyCSDetailStateLoaded({
-    required this.Customer,
-    required this.listcushist,
-    required this.listcuscontract,
-    required this.listGroupFold,
-    required this.listColumnFold,
+    required this.customerDetail,
+    required this.listCall,
+    required this.listTicket,
+    required this.listCampaign,
   });
+
+  final SKY_CustomerDetail customerDetail;
+  final List<SKY_CustomerCallCall> listCall;
+  final List<SKY_CustomerETTicket> listTicket;
+  final List<SKY_CustomerCpnCampaignCustomer> listCampaign;
 }
 
 final class CustomerSkyCSDetailStateError extends CustomerSkyCSDetailState {
-  final String message;
+  CustomerSkyCSDetailStateError({required this.message});
 
-  CustomerSkyCSDetailStateError(this.message);
+
+  final String message;
 }

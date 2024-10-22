@@ -1,4 +1,5 @@
 import 'package:idnstd/core/utils/typedef.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/rt_sky_customer_all_detail.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/rt_sky_customer_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_column.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_contact.dart';
@@ -9,6 +10,7 @@ import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_info.dar
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_partner_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_zalo_user.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/create_customer.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_by_customer_code_sys.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_customer_partner_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_customer_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_by_cutomer_code_sys.dart';
@@ -30,9 +32,10 @@ abstract class SKY_CustomerRepository {
   ResultFuture<List<SKY_CustomerPartnerType>> getAllCustomerPartnerType({required GetAllCustomerPartnerTypeParams params});
   ResultFuture<List<SKY_CustomerZaloUser>> searchZaloUser({required SearchZaloUserParams params});
 
-  // manage
+  // manage + detail
   ResultFuture<List<SKY_CustomerInfo>> searchCustomer({required SearchCustomerSkyCSParams params});
   ResultFuture<SKY_CustomerDetail> getByCustomerCodeSys({required GetByCustomerCodeSysParams params});
   ResultFuture<List<SKY_CustomerHist>> searchCustomerHist({required SearchCustomerHistParams params});
   ResultFuture<List<SKY_CustomerContact>> searchCustomerContact({required SearchCustomerContactParams params});
+  ResultFuture<RT_SKY_CustomerAllDetail> getAllByCustomerCodeSys({required GetAllByCustomerCodeSysParams params});
 }

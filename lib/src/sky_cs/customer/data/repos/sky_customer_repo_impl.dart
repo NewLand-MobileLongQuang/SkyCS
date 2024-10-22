@@ -3,6 +3,7 @@ import 'package:idnstd/core/errors/exceptions.dart';
 import 'package:idnstd/core/errors/failure.dart';
 import 'package:idnstd/core/utils/typedef.dart';
 import 'package:idnstd/src/sky_cs/customer/data/datasource/sky_customer_datasource.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/rt_sky_customer_all_detail.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/rt_sky_customer_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_column.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_contact.dart';
@@ -14,6 +15,7 @@ import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_partner_
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_zalo_user.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/repos/sky_customer_repo.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/create_customer.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_by_customer_code_sys.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_customer_partner_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_customer_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_by_cutomer_code_sys.dart';
@@ -134,6 +136,16 @@ class SKY_CustomerRepositoryImpl implements SKY_CustomerRepository {
   ResultFuture<List<SKY_CustomerContact>> searchCustomerContact({required SearchCustomerContactParams params}) async {
     try {
       final result = await _dataSource.searchCustomerContact(params: params);
+      return Right(result);
+    } on ApiException catch (e) {
+      return Left(ApiFailure.fromException(e));
+    }
+  }
+
+  @override
+  ResultFuture<RT_SKY_CustomerAllDetail> getAllByCustomerCodeSys({required GetAllByCustomerCodeSysParams params}) async {
+    try {
+      final result = await _dataSource.getAllByCustomerCodeSys(params: params);
       return Right(result);
     } on ApiException catch (e) {
       return Left(ApiFailure.fromException(e));

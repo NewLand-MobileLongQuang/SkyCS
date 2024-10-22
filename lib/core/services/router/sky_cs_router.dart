@@ -121,9 +121,7 @@ PageRouteBuilder? handleCaseSkyCS(RouteSettings settings) {
 
     case CustomerSkyCSManageScreen.routeName:
       return pageBuilder(
-              (p0) => BlocProvider(
-              create: (_) => sl<CustomerSkyCSManageCubit>(),
-              child: const CustomerSkyCSManageScreen()),
+              (p0) => const CustomerSkyCSManageScreen(),
           settings: settings);
 
     case eTicketManageScreen.routeName:

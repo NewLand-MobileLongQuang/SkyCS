@@ -28,7 +28,7 @@ class BaseRemoteDataSource {
           headers: headers,
           body: params
       );
-      print("TrungLQ1: $uri");
+      // print("TrungLQ1: $uri");
       // print("TrungLQ2: $headers");
       // print("TrungLQ3: $params");
       if (response.statusCode == 200 || response.statusCode == 201) {

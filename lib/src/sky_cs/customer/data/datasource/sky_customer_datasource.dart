@@ -1,5 +1,6 @@
 import 'package:idnstd/core/data/datasource/client_service/skycs_data_source.dart';
 import 'package:idnstd/core/errors/exceptions.dart';
+import 'package:idnstd/src/sky_cs/customer/data/models/rt_sky_customer_all_detail_model.dart';
 import 'package:idnstd/src/sky_cs/customer/data/models/rt_sky_customer_type_model.dart';
 import 'package:idnstd/src/sky_cs/customer/data/models/sky_customer_column_model.dart';
 import 'package:idnstd/src/sky_cs/customer/data/models/sky_customer_contact_model.dart';
@@ -10,6 +11,7 @@ import 'package:idnstd/src/sky_cs/customer/data/models/sky_customer_info_model.d
 import 'package:idnstd/src/sky_cs/customer/data/models/sky_customer_partner_type_model.dart';
 import 'package:idnstd/src/sky_cs/customer/data/models/sky_customer_zalo_user_model.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/create_customer.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_by_customer_code_sys.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_customer_partner_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_customer_type.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_by_cutomer_code_sys.dart';
@@ -166,7 +168,7 @@ class SKY_CustomerDataSource extends SkyCSSvDataSource {
     }
   }
 
-  // manage
+  // manage + detail
 
   Future<List<SKY_CustomerInfoModel>> searchCustomer({required SearchCustomerSkyCSParams params}) async {
     final paramsInit = {
@@ -256,4 +258,24 @@ class SKY_CustomerDataSource extends SkyCSSvDataSource {
       throw ApiException(Message: ex.toString());
     }
   }
+
+  Future<RT_SKY_CustomerAllDetailModel> getAllByCustomerCodeSys({required GetAllByCustomerCodeSysParams params}) async {
+    final paramsInit = {
+      'CustomerCodeSys': params.CustomerCodeSys,
+    };
+    try {
+      final response = await postGetAllByCustomerCodeSys(
+        path: 'MstCustomer/GetAllByCustomerCodeSys',
+        params: paramsInit,
+      );
+      return response.objResult!;
+    }
+    on ApiException {
+      rethrow;
+    }
+    on Exception catch (ex) {
+      throw ApiException(Message: ex.toString());
+    }
+  }
+
 }
