@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:idnstd/core/common/views/loading_view.dart';
-import 'package:idnstd/core/common/widgets/inputs/i_select_field.dart';
 import 'package:idnstd/core/res/colors.dart';
 import 'package:idnstd/core/res/strings.dart';
 import 'package:idnstd/core/res/test_style.dart';
 import 'package:idnstd/core/utils/string_generate.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_call_call.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_cpn_campaign_customer.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_detail.dart';
 import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_et_ticket.dart';
+import 'package:idnstd/src/sky_cs/customer/presentation/cubit/customer_skycs_detail_cubit/customer_skycs_detail_cubit.dart';
 import 'package:idnstd/src/sky_cs/customer/presentation/widgets/called_view.dart';
 import 'package:idnstd/src/sky_cs/customer/presentation/widgets/campaign_view.dart';
 import 'package:idnstd/src/sky_cs/customer/presentation/widgets/change_view.dart';
@@ -15,20 +17,12 @@ import 'package:idnstd/src/sky_cs/customer/presentation/widgets/contact_view.dar
 import 'package:idnstd/src/sky_cs/customer/presentation/widgets/e_ticket_view.dart';
 import 'package:idnstd/src/sky_cs/customer/presentation/widgets/info_customer_view.dart';
 
-import '../../data/models/sky_customer_column_model.dart';
-import '../../data/models/sky_customer_group_model.dart';
-import '../../domain/entities/sky_customer_contact.dart';
-import '../../domain/entities/sky_customer_detail.dart';
-import '../../domain/entities/sky_customer_hist.dart';
-import '../cubit/customer_skycs_detail_cubit/customer_skycs_detail_cubit.dart';
-import '../widgets/all_view.dart';
-
 class CustomerSkyCSDetailScreen extends StatefulWidget {
   final String customerCodeSys;
   const CustomerSkyCSDetailScreen({
     required this.customerCodeSys,
-    super.key}
-      );
+    super.key,
+  });
 
   static const routeName = '/customer-skycs-detail';
 
@@ -89,6 +83,7 @@ class _CustomerSkyCSDetailScreenState extends State<CustomerSkyCSDetailScreen> {
                   _tabBar(),
                   _tabBarView(
                     customer: state.customerDetail,
+                    listCall: state.listCall,
                     listTicket: state.listTicket,
                     listCampaign: state.listCampaign,
                   ),
@@ -218,14 +213,15 @@ class _CustomerSkyCSDetailScreenState extends State<CustomerSkyCSDetailScreen> {
 
   Widget _tabBarView({
     required SKY_CustomerDetail customer,
+    required List<SKY_CustomerCallCall> listCall,
     required List<SKY_CustomerETTicket> listTicket,
     required List<SKY_CustomerCpnCampaignCustomer> listCampaign,
   }) {
     return Expanded(
       child: TabBarView(
         children: [
-          ETicketView(listTicket: listTicket),
-          ETicketView(listTicket: listTicket),
+          CalledView(listCall: listCall),
+          CalledView(listCall: listCall),
 
           ETicketView(listTicket: listTicket),
           CampaignView(listCampaign: listCampaign),

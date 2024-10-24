@@ -4,9 +4,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:idnstd/core/res/colors.dart';
 import 'package:idnstd/core/res/media_res.dart';
 import 'package:idnstd/core/res/test_style.dart';
+import 'package:idnstd/src/sky_cs/customer/domain/entities/sky_customer_call_call.dart';
 
 class CalledView extends StatefulWidget {
-  const CalledView({super.key});
+  const CalledView({required this.listCall, super.key});
+
+  final List<SKY_CustomerCallCall> listCall;
 
   @override
   State<CalledView> createState() => _CalledViewState();
@@ -47,6 +50,24 @@ class _CalledViewState extends State<CalledView> {
 
   @override
   Widget build(BuildContext context) {
+    return ListView.separated(
+      itemBuilder: (context, index) {
+        if(widget.listCall[index].State == '6'){
+          return _calledSuccess(widget.listCall[index]);
+        }
+        else {
+          return _callMiss(widget.listCall[index]);
+        }
+      },
+      separatorBuilder: (context, index) => const Divider(
+        height: 1,
+        color: AppColors.divideColor,
+      ),
+      itemCount: widget.listCall.length,
+    );
+  }
+
+  Widget _calledSuccess(SKY_CustomerCallCall detailCall) {
     return InkWell(
       onTap: () {
 
@@ -60,14 +81,14 @@ class _CalledViewState extends State<CalledView> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SvgPicture.asset(AppMediaRes.iconCallIn,),
+            if (detailCall.CallType == '1') SvgPicture.asset(AppMediaRes.iconCallIn) else SvgPicture.asset(AppMediaRes.iconCallOut),
             const SizedBox(width: 8,),
             Expanded(child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Cuộc gọi đến từ khách hàng 0123456789',
+                  detailCall.CallType == '1' ? 'Cuộc gọi đến từ khách hàng ${detailCall.ToNumber}' : 'Cuộc gọi đi tới khách hàng ${detailCall.ToNumber}',
                   style: AppTextStyles.textStyleInterW500S14Black,
                   // overflow: TextOverflow.ellipsis,
                   maxLines: 3,
@@ -158,66 +179,69 @@ class _CalledViewState extends State<CalledView> {
         ),
       ),
     );
-    // return InkWell(
-    //   onTap: () {
-    //
-    //   },
-    //   child: Container(
-    //     padding: const EdgeInsets.all(8),
-    //     width: double.infinity,
-    //     decoration: const BoxDecoration(
-    //       color: AppColors.white,
-    //     ),
-    //     child: Row(
-    //       crossAxisAlignment: CrossAxisAlignment.start,
-    //       children: [
-    //         SvgPicture.asset(MediaRes.iconCallInMiss,),
-    //         const SizedBox(width: 8,),
-    //         Expanded(child: Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: [
-    //             Text(
-    //               'Cuộc gọi nhỡ đến từ khách hàng 0123456789',
-    //               style: TextStyleApp.textStyleInterW500S14Black,
-    //               // overflow: TextOverflow.ellipsis,
-    //               maxLines: 3,
-    //             ),
-    //             Row(
-    //               children: [
-    //                 Text(
-    //                   'TG gọi:',
-    //                   style: TextStyleApp.textStyleInterW400S12Grey,
-    //                   overflow: TextOverflow.ellipsis,
-    //                 ),
-    //                 Expanded(child: Container(),),
-    //                 Text(
-    //                   '2023-03-20 09:15',
-    //                   style: TextStyleApp.textStyleInterW500S12Black,
-    //                   overflow: TextOverflow.ellipsis,
-    //                 ),
-    //               ],
-    //             ),
-    //             Row(
-    //               children: [
-    //                 Text(
-    //                   'Agent thực hiện:',
-    //                   style: TextStyleApp.textStyleInterW400S12Grey,
-    //                   overflow: TextOverflow.ellipsis,
-    //                 ),
-    //                 Expanded(child: Container(),),
-    //                 Text(
-    //                   'Lê Quốc Trung',
-    //                   style: TextStyleApp.textStyleInterW500S12Black,
-    //                   overflow: TextOverflow.ellipsis,
-    //                 ),
-    //               ],
-    //             ),
-    //           ],
-    //         ),)
-    //       ],
-    //     ),
-    //   ),
-    // );
+  }
+
+  Widget _callMiss(SKY_CustomerCallCall detailCall) {
+    return InkWell(
+      onTap: () {
+
+      },
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          color: AppColors.textWhiteColor,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SvgPicture.asset(AppMediaRes.iconCallInMiss,),
+            const SizedBox(width: 8,),
+            Expanded(child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Cuộc gọi nhỡ đến từ khách hàng 0123456789',
+                  style: AppTextStyles.textStyleInterW500S14Black,
+                  // overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      'TG gọi:',
+                      style: AppTextStyles.textStyleInterW400S12Grey,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Expanded(child: Container(),),
+                    Text(
+                      '2023-03-20 09:15',
+                      style: AppTextStyles.textStyleInterW500S12Black,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      'Agent thực hiện:',
+                      style: AppTextStyles.textStyleInterW400S12Grey,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Expanded(child: Container(),),
+                    Text(
+                      'Lê Quốc Trung',
+                      style: AppTextStyles.textStyleInterW500S12Black,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ],
+            ),)
+          ],
+        ),
+      ),
+    );
   }
 }

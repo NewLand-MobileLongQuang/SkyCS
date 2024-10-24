@@ -9,17 +9,8 @@ import 'package:idnstd/src/sky_cs/customer/domain/usecases/get_all_by_customer_c
 import 'package:meta/meta.dart';
 
 import '../../../../../../core/configs/app_config.dart';
-import '../../../data/models/sky_customer_column_model.dart';
-import '../../../data/models/sky_customer_group_model.dart';
-import '../../../domain/entities/sky_customer_contact.dart';
 import '../../../domain/entities/sky_customer_detail.dart';
-import '../../../domain/entities/sky_customer_hist.dart';
 import '../../../domain/usecases/get_by_cutomer_code_sys.dart';
-import '../../../domain/usecases/search_customer.dart';
-import '../../../domain/usecases/search_customer_column.dart';
-import '../../../domain/usecases/search_customer_contact.dart';
-import '../../../domain/usecases/search_customer_group.dart';
-import '../../../domain/usecases/search_customer_hist.dart';
 
 part 'customer_skycs_detail_state.dart';
 
